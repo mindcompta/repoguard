@@ -77,6 +77,11 @@ def _parser() -> argparse.ArgumentParser:
     demo.add_argument('--lang', choices=['en', 'fr'], default='en', help='Language for text and HTML reports.')
     demo.add_argument('-o', '--output', help='Write report to a new file instead of standard output.')
     demo.add_argument('--force', action='store_true', help='Overwrite an existing output file.')
+    web = sub.add_parser('web', help='Open the local browser interface (no scan is run until you choose a folder).')
+    web.add_argument('--port', type=int, default=0, help='Local port (0 chooses a free port).')
+    web.add_argument('--host', default='127.0.0.1', help='Listen address; non-loopback is allowed only for the synthetic demo.')
+    web.add_argument('--no-browser', action='store_true', help='Do not open a browser automatically.')
+    web.add_argument('--demo', action='store_true', help='Serve a synthetic preview that cannot scan files or query OSV.')
     return parser
 
 
@@ -117,6 +122,10 @@ def main(argv: list[str] | None = None) -> int:
     parser = _parser()
     args = parser.parse_args(argv)
     try:
+        if args.command == 'web':
+            from .web import run_web
+            run_web(host=args.host, port=args.port, demo=args.demo, open_browser=not args.no_browser)
+            return 0
         if args.command == 'demo':
             report = _demo_report()
         else:

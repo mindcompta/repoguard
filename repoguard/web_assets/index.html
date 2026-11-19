@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <meta name="repoguard-mode" content="__REPOGUARD_MODE__">
+  <title>RepoGuard — Analyser un projet</title>
+  <style>
+    :root{color-scheme:dark;--bg:#09120f;--panel:#101d17;--panel2:#14251b;--line:#294333;--text:#edf5ef;--muted:#a5bcac;--dim:#7f9b89;--green:#a5efb5;--green2:#71c98d;--gold:#e7cd8d;--red:#ffb7ab;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;font-synthesis:none}*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--text);font-size:14px;line-height:1.55}button,input{font:inherit}fieldset{border:0;margin:0;padding:0;min-width:0}button{cursor:pointer}button:disabled{cursor:not-allowed;opacity:.5}button:focus-visible,input:focus-visible,summary:focus-visible{outline:3px solid #a5efb5;outline-offset:3px}svg{display:block}h1,h2,h3,p{margin:0}a{color:var(--green)}[hidden]{display:none!important}.wrap{width:min(1190px,calc(100% - 64px));margin:auto}.top{border-bottom:1px solid #23382c;background:#0c1812}.top-inner{height:74px;display:flex;align-items:center;justify-content:space-between;gap:16px}.brand{display:flex;align-items:center;gap:11px;font-weight:850;font-size:19px;letter-spacing:-.05em}.brand-mark{display:grid;place-items:center;background:var(--green);color:#102518;width:36px;height:36px;border-radius:10px}.brand-mark svg{width:23px;height:23px}.brand small{margin-left:7px;color:#8eaf99;font-size:9px;letter-spacing:.13em;font-weight:800}.top-actions{display:flex;align-items:center;gap:13px}.local-pill,.demo-pill{display:inline-flex;align-items:center;gap:7px;border:1px solid #3b5a43;border-radius:20px;padding:6px 10px;color:#b8e3c3;font-size:10px;font-weight:750;letter-spacing:.08em;white-space:nowrap}.local-pill:before{content:"";width:6px;height:6px;border-radius:100%;background:#8ce4a7}.quit{background:transparent;color:#b3c7b9;border:1px solid #365040;border-radius:8px;padding:8px 12px;font-size:11px;font-weight:700}.quit:hover{color:white;border-color:#7eaa8a}.hero{position:relative;padding:60px 0 37px;overflow:hidden}.hero:after{content:"";position:absolute;z-index:-1;right:-100px;top:-150px;width:520px;height:400px;background:radial-gradient(ellipse,rgba(93,174,107,.15),transparent 69%);pointer-events:none}.hero-top{display:flex;justify-content:space-between;gap:24px;align-items:flex-start}.eyebrow{font-size:10px;font-weight:850;letter-spacing:.14em;color:#96d4a4;text-transform:uppercase}.hero h1{font-size:clamp(37px,4.4vw,56px);line-height:1.08;letter-spacing:-.06em;max-width:720px;margin:14px 0}.hero h1 span{color:var(--green)}.hero p.lead{max-width:660px;color:var(--muted);font-size:14px;line-height:1.75}.hero-index{display:flex;gap:13px;color:#89aa93;font:10px ui-monospace,SFMono-Regular,Consolas,monospace;margin-top:11px;white-space:nowrap}.hero-index b{color:#b6dfbf}.trust-row{display:flex;gap:18px;flex-wrap:wrap;margin-top:24px;color:#9bb8a3;font-size:10px;font-weight:700}.trust-row span{display:flex;align-items:center;gap:7px}.trust-row svg{width:15px;height:15px;stroke:#8bd6a0;fill:none;stroke-width:1.7}.demo-banner{padding:13px 16px;margin:0 0 18px;border:1px solid #816b36;border-radius:10px;background:#3a311b;color:#f1dfac;font-size:12px}.demo-banner strong{font-size:10px;letter-spacing:.08em;margin-right:8px}.layout{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(270px,.7fr);gap:17px;align-items:start}.panel{background:var(--panel);border:1px solid var(--line);border-radius:15px;min-width:0}.form-panel{padding:29px}.panel-top{display:flex;align-items:center;justify-content:space-between;gap:15px;padding-bottom:22px;border-bottom:1px solid #263d2f}.panel-top h2{font-size:18px;letter-spacing:-.035em}.panel-top p{color:var(--dim);font-size:11px;margin-top:3px}.panel-badge{padding:5px 8px;border:1px solid #355541;border-radius:6px;color:#a8d7b2;font-size:9px;font-weight:800;letter-spacing:.08em;white-space:nowrap}.step{padding-top:25px}.step-title{display:flex;align-items:center;gap:9px;margin-bottom:11px;font-size:13px;font-weight:800}.step-number{display:grid;place-items:center;width:22px;height:22px;border:1px solid #3a6045;border-radius:7px;color:#9fe4af;font:10px ui-monospace,SFMono-Regular,Consolas,monospace}.help{color:var(--muted);font-size:12px;line-height:1.6}.path-field{display:flex;gap:9px;margin-top:13px}.path-field input{min-width:0;flex:1;background:#0b1711;border:1px solid #3a5541;color:#e8f4e9;border-radius:9px;padding:12px 13px;font-size:13px}.path-field input::placeholder{color:#668170}.browse{padding:11px 15px;border:1px solid #4a7054;border-radius:9px;background:#172b1e;color:#d9efde;font-size:12px;font-weight:800;white-space:nowrap}.browse:hover:not(:disabled){background:#203b29}.micro{color:#8ca895;font-size:11px;line-height:1.6;margin-top:9px}.micro strong{color:#c0dfc8}.option-row{display:flex;align-items:flex-start;gap:12px;border:1px solid #2e4936;background:#122219;border-radius:10px;padding:14px;margin-top:12px}.option-row input{margin:3px 0 0;accent-color:#9ce8ac;width:16px;height:16px;flex:none}.option-row strong{display:block;font-size:12px}.option-row small{display:block;color:#97b2a0;font-size:11px;line-height:1.5;margin-top:3px}.choice-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}.choice{position:relative;display:flex;gap:10px;align-items:flex-start;border:1px solid #34503b;background:#0d1a12;border-radius:10px;padding:14px;cursor:pointer}.choice:has(input:checked){border-color:#85d79a;background:#182f20;box-shadow:inset 0 0 0 1px rgba(141,220,159,.12)}.choice input{accent-color:#a4edb4;width:15px;height:15px;flex:none;margin:3px 0 0}.choice strong{display:block;font-size:12px}.choice small{display:block;color:#9db5a3;font-size:11px;line-height:1.5;margin-top:4px}.choice.is-disabled{opacity:.55;cursor:not-allowed}.privacy-note{margin-top:11px;border-left:2px solid #6fbd83;padding:3px 0 3px 11px;color:#a2bdaa;font-size:11px;line-height:1.6}.action-row{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-top:27px}.primary{display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:47px;border:1px solid var(--green);border-radius:9px;background:var(--green);color:#102619;padding:11px 18px;font-size:12px;font-weight:850}.primary:hover:not(:disabled){background:#c1f6ca}.primary svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.8}.action-caption{font-size:10px;color:#89a690;max-width:260px}.alert{margin-top:16px;padding:12px 13px;border:1px solid #835750;border-radius:8px;background:#3a2522;color:#ffd0c7;font-size:12px;overflow-wrap:anywhere}.progress{margin-top:17px;border:1px solid #38543e;background:#13261a;border-radius:10px;padding:14px}.progress-line{height:5px;overflow:hidden;background:#294534;border-radius:8px;margin:11px 0}.progress-line:after{content:"";display:block;width:34%;height:100%;background:var(--green);border-radius:8px;animation:travel 1.5s ease-in-out infinite alternate}@keyframes travel{to{transform:translateX(200%)}}.progress strong{font-size:12px}.progress p{font-size:11px;color:#a7c6af}.side{padding:24px}.side h2{font-size:14px;letter-spacing:-.02em}.side-sub{font-size:11px;color:#94ad9b;margin-top:5px}.timeline{margin-top:22px;display:grid;gap:19px}.timeline-item{display:grid;grid-template-columns:29px 1fr;gap:10px}.timeline-icon{display:grid;place-items:center;width:29px;height:29px;background:#1b3322;border:1px solid #395c41;border-radius:8px;color:#a5eab2;font-size:12px;font-weight:800}.timeline-item strong{font-size:11px;display:block;margin:1px 0 3px}.timeline-item p{color:#9db5a3;font-size:11px;line-height:1.55}.side-divider{height:1px;background:#2b4132;margin:23px 0}.side-highlight{padding:13px;background:#192c20;border:1px solid #36543d;border-radius:9px}.side-highlight strong{color:#cce9d3;display:block;font-size:11px;margin-bottom:5px}.side-highlight p{color:#a6c1ad;font-size:11px;line-height:1.6}.side details{margin-top:16px;color:#9bb3a1;font-size:11px}.side summary{cursor:pointer;color:#c1d8c6;font-size:11px;font-weight:700}.side details p{margin-top:9px;line-height:1.6}.results{margin-top:40px}.results-head{display:flex;align-items:end;justify-content:space-between;gap:20px;margin-bottom:16px}.results-head h2{font-size:25px;letter-spacing:-.045em;margin-top:5px}.results-head p{font-size:12px;color:var(--muted);margin-top:6px}.status-pill{border:1px solid #41674a;border-radius:20px;padding:6px 10px;color:#b8e5c1;font-size:10px;font-weight:750;white-space:nowrap}.status-pill.partial{border-color:#806a3c;color:#efce89;background:#332b1c}.results-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.result-stat{border:1px solid var(--line);background:var(--panel);border-radius:11px;padding:15px 16px}.result-stat span{display:block;font-size:10px;color:#a3baa9;font-weight:750;text-transform:uppercase;letter-spacing:.05em}.result-stat strong{display:block;font-size:25px;letter-spacing:-.04em;margin-top:5px}.result-stat small{font-size:10px;color:#91aa99}.result-note{margin-top:12px;color:#acc2b1;font-size:11px;line-height:1.6}.report-box{margin-top:18px;overflow:hidden;border:1px solid var(--line);border-radius:13px;background:#0b1611}.report-bar{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:15px 17px;border-bottom:1px solid #294332}.report-bar strong{display:block;font-size:12px}.report-bar span{font-size:10px;color:#8da895}.report-actions{display:flex;gap:8px;flex-wrap:wrap}.secondary{border:1px solid #42634a;border-radius:8px;background:#16291d;color:#d6eddb;padding:9px 11px;font-size:10px;font-weight:800}.secondary:hover{background:#22402b}.report-frame{display:block;width:100%;height:920px;border:0;background:#0a1211}.footer{display:flex;justify-content:space-between;gap:20px;border-top:1px solid #273d2e;margin-top:55px;padding:24px 0 35px;color:#839d8a;font-size:10px}.footer strong{color:#d1e6d6}.footer span:last-child{text-align:right}@media(max-width:850px){.wrap{width:calc(100% - 40px)}.hero{padding-top:43px}.hero-index{display:none}.layout{grid-template-columns:1fr}.side{display:grid;grid-template-columns:1fr 1fr;gap:15px}.side-divider{display:none}.side-bottom{align-self:center}.timeline{margin-top:16px}.results-stats{grid-template-columns:repeat(2,1fr)}}@media(max-width:530px){.wrap{width:calc(100% - 30px)}.top-inner{height:64px;gap:8px}.brand{font-size:17px;gap:7px}.brand-mark{width:32px;height:32px}.brand small{display:none}.top-actions{gap:7px}.local-pill{font-size:9px;letter-spacing:.02em;padding:6px 8px}.quit{padding:7px 9px}.hero{padding:36px 0 27px}.hero h1{font-size:39px}.hero p.lead{font-size:13px}.trust-row{gap:10px 15px}.form-panel{padding:20px}.panel-top{align-items:flex-start}.panel-badge{display:none}.path-field{flex-direction:column}.browse{width:100%}.choice-grid{grid-template-columns:1fr}.action-row{align-items:stretch;flex-direction:column}.primary{width:100%}.side{display:block}.side-bottom{margin-top:20px}.results-head{align-items:start;flex-direction:column}.report-bar{align-items:start;flex-direction:column}.report-frame{height:810px}.footer{flex-direction:column}.footer span:last-child{text-align:left}}@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.progress-line:after{animation:none}}
+  </style>
+</head>
+<body>
+  <header class="top"><div class="wrap top-inner"><div class="brand"><span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 2.5 20 6v5.6c0 5-3.1 8.1-8 10.1-4.9-2-8-5.1-8-10.1V6z" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="m9.2 9-2.2 2.5L9.2 14m5.6-5 2.2 2.5-2.2 2.5M13 8l-2 7" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>repoguard<span>.<small>TABLEAU DE BORD</small></span></div><div class="top-actions"><span class="local-pill" id="top-mode" aria-label="Interface locale">LOCAL</span><button class="quit" id="quit" type="button">Quitter</button></div></div></header>
+  <main class="wrap">
+    <section class="hero"><div class="hero-top"><div><p class="eyebrow">VOTRE PROJET, EN TOUTE CLARTÉ</p><h1>Un regard plus clair<br>sur votre projet<span>.</span></h1><p class="lead">Choisissez un dossier, lancez l’analyse et découvrez ce qui mérite votre attention. Aucune ligne de commande à saisir ici.</p></div><div class="hero-index"><span>RÉPERTOIRE</span><b>01 — 03</b></div></div><div class="trust-row"><span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 5 6v5c0 4.5 2.5 7 7 9 4.5-2 7-4.5 7-9V6z"/><path d="m9 12 2 2 4-4"/></svg>Projet non exécuté</span><span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 10V7a7 7 0 0 1 14 0v3M5 10h14v10H5z"/><path d="M12 13v4"/></svg>Local par défaut</span><span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h10l4 4v12H5zM15 4v4h4M8 12h8M8 16h6"/></svg>Rapport explicable</span></div></section>
+    <div id="demo-banner" class="demo-banner" hidden><strong>DÉMONSTRATION FICTIVE</strong> Cette prévisualisation ne lit aucun dossier et ne contacte pas OSV. Installez RepoGuard sur votre ordinateur pour analyser vos projets.</div>
+    <div class="layout">
+      <section class="panel form-panel" aria-labelledby="form-title"><div class="panel-top"><div><h2 id="form-title">Nouvelle analyse</h2><p>Configurez votre première vérification en quelques clics.</p></div><span class="panel-badge">LOCAL D’ABORD</span></div>
+        <div class="step"><div class="step-title"><span class="step-number">01</span><label for="directory">Quel projet souhaitez-vous analyser ?</label></div><p class="help">Sélectionnez le dossier sur votre ordinateur ou collez son chemin ci-dessous.</p><div class="path-field"><input id="directory" type="text" maxlength="4096" autocomplete="off" spellcheck="false" placeholder="Ex. C:\Users\Moi\Documents\MonProjet"><button class="browse" id="browse" type="button">Choisir un dossier</button></div><p id="browse-hint" class="micro">Vous pouvez aussi copier le chemin depuis l’explorateur. Choisissez un dossier stocké localement.</p></div>
+        <div class="step"><div class="step-title"><span class="step-number">02</span>Choisissez le périmètre</div><label class="option-row" for="deep"><input id="deep" type="checkbox" checked><span><strong>Analyse approfondie</strong><small>Inclut aussi les dossiers de dépendances et de code tiers ; cela peut prendre plusieurs minutes. Décochez pour une analyse standard, plus légère.</small></span></label></div>
+        <div class="step"><fieldset id="osv-fieldset"><legend class="step-title"><span class="step-number">03</span>Vérifier les dépendances avec OSV ?</legend><p class="help">OSV est une base d’avis de sécurité. À vous de choisir si RepoGuard doit la consulter.</p><div class="choice-grid"><label class="choice" id="choice-local"><input type="radio" name="osv" value="no" checked><span><strong>Non, rester local</strong><small>Aucune consultation OSV. Les versions sont inventoriées sans recherche en ligne.</small></span></label><label class="choice" id="choice-osv"><input type="radio" name="osv" value="yes"><span><strong>Oui, consulter OSV</strong><small>Envoie les noms, écosystèmes et versions exactes inventoriés à api.osv.dev.</small></span></label></div><div class="privacy-note">Le code source, les chemins et les valeurs trouvées ne sont pas transmis à OSV en tant que tels. Les noms de paquets et l’adresse IP peuvent être sensibles.</div></fieldset></div>
+        <div id="error" class="alert" role="alert" hidden></div><div class="action-row"><button class="primary" id="scan" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h15m-5-5 5 5-5 5"/></svg><span>Lancer l’analyse</span></button><p class="action-caption">Le projet n’est pas modifié. Aucun rapport n’est publié en ligne.</p></div>
+        <div id="progress" class="progress" role="status" aria-live="polite" hidden><strong id="progress-title">Analyse en cours…</strong><div class="progress-line" aria-hidden="true"></div><p id="progress-message">Les grands projets peuvent prendre plusieurs minutes.</p></div>
+      </section>
+      <aside class="panel side"><div><p class="eyebrow">EN TROIS ÉTAPES</p><h2>Simple, sans perdre le contexte.</h2><p class="side-sub">Un premier contrôle que vous gardez sous votre responsabilité.</p><div class="timeline"><div class="timeline-item"><span class="timeline-icon">1</span><div><strong>Choisir le projet</strong><p>Les fichiers sont lus sur cet ordinateur ; le projet n’est pas exécuté.</p></div></div><div class="timeline-item"><span class="timeline-icon">2</span><div><strong>Décider pour OSV</strong><p>Vous choisissez si les versions de paquets sont vérifiées en ligne.</p></div></div><div class="timeline-item"><span class="timeline-icon">3</span><div><strong>Comprendre le rapport</strong><p>Alertes possibles, informations publiques et couverture restent séparées.</p></div></div></div></div><div class="side-bottom"><div class="side-divider"></div><div class="side-highlight"><strong>◈ &nbsp;Votre rapport vous appartient</strong><p>Il reste en mémoire jusqu’à l’arrêt de RepoGuard. Téléchargez-le pour le conserver. Ses chemins et noms de paquets peuvent être sensibles.</p></div><details><summary>Ce que RepoGuard ne vérifie pas</summary><p>L’historique Git, les autres branches, les binaires et le contenu des archives ne sont pas analysés. Des limites et des faux positifs restent possibles : un rapport vide ne garantit pas la sécurité.</p></details></div></aside>
+    </div>
+    <section id="results" class="results" aria-labelledby="results-title" hidden><div class="results-head"><div><p class="eyebrow">VOTRE ANALYSE</p><h2 id="results-title">Le rapport est prêt.</h2><p>Chaque alerte est une piste à vérifier, pas une faille confirmée.</p></div><span id="result-status" class="status-pill">Analyse terminée dans son périmètre</span></div><div class="results-stats"><div class="result-stat"><span>Fichiers texte</span><strong id="stat-files">0</strong><small id="stat-files-help">analysés</small></div><div class="result-stat"><span>Secrets possibles</span><strong id="stat-secrets">0</strong><small id="stat-secrets-help">à vérifier</small></div><div class="result-stat"><span>Informations</span><strong id="stat-info">0</strong><small>pas des verdicts de faille</small></div><div class="result-stat"><span>Avis OSV</span><strong id="stat-osv">0</strong><small id="stat-osv-help">non consulté</small></div></div><p class="result-note" id="result-note">Le rapport indique les éléments ignorés, les limites et les résultats tiers. Aucun résultat ne prouve qu’un projet est sûr.</p><div class="report-box"><div class="report-bar"><div><strong>Rapport détaillé</strong><span>Consultable ici, sans publication</span></div><div class="report-actions"><button id="download" class="secondary" type="button">Télécharger le rapport HTML</button><button id="new-scan" class="secondary" type="button">Nouvelle analyse</button></div></div><iframe id="report-frame" class="report-frame" title="Rapport RepoGuard détaillé" sandbox="allow-popups allow-popups-to-escape-sandbox"></iframe></div></section>
+    <footer class="footer"><span><strong>repoguard.</strong> Un outil libre pour y voir plus clair.</span><span id="footer-status">Utilisez « Quitter » pour arrêter RepoGuard. Arrêt après 30 minutes sans communication de la page.</span></footer>
+  </main>
+  <script>
+    (() => {
+      'use strict';
+      const demo = document.querySelector('meta[name="repoguard-mode"]').content === 'demo';
+      const $ = id => document.getElementById(id);
+      const fields = ['directory','browse','deep','scan'];
+      let token = demo ? 'repoguard-synthetic-demo' : '';
+      let timer = null, reportUrl = null, busy = false;
+      if (!demo) {
+        const fragment = location.hash.slice(1);
+        try {
+          token = fragment || sessionStorage.getItem('repoguard-local-token') || '';
+          if (fragment) sessionStorage.setItem('repoguard-local-token', fragment);
+        } catch (_) { token = fragment; }
+        if (fragment) { try { history.replaceState(null, '', location.pathname + location.search); } catch (_) {} }
+      } else {
+        $('demo-banner').hidden = false;
+        $('top-mode').textContent = 'DÉMONSTRATION';
+        $('quit').hidden = true;
+        $('footer-status').textContent = 'Aucun fichier personnel n’est lu dans cette démonstration.';
+        $('directory').value = 'Projet fictif de démonstration';
+        $('directory').readOnly = true;
+        $('deep').disabled = true;
+        document.querySelectorAll('input[name="osv"]').forEach(el => { el.disabled = true; });
+        $('choice-osv').classList.add('is-disabled');
+        $('scan').querySelector('span').textContent = 'Lancer la démonstration';
+      }
+      function showError(message) { $('error').textContent = message; $('error').hidden = !message; }
+      function setBusy(value) {
+        busy = value;
+        $('scan').disabled = value || !token;
+        $('directory').disabled = value && !demo;
+        if (!demo) $('deep').disabled = value;
+        document.querySelectorAll('input[name="osv"]').forEach(el => { if (!demo) el.disabled = value; });
+        $('progress').hidden = !value;
+        if (value) $('browse').disabled = true;
+      }
+      async function request(path, method = 'GET', body) {
+        const options = {method, headers: {'X-RepoGuard-Token': token}, cache: 'no-store', credentials: 'omit'};
+        if (body !== undefined) { options.headers['Content-Type'] = 'application/json'; options.body = JSON.stringify(body); }
+        let response;
+        try { response = await fetch(path, options); }
+        catch (_) { throw new Error('Impossible de joindre RepoGuard. Vérifiez que le programme local est encore ouvert.'); }
+        if (!response.ok) {
+          let data = {};
+          try { data = await response.json(); } catch (_) {}
+          throw new Error(data.error || 'La demande n’a pas pu être effectuée.');
+        }
+        return response;
+      }
+      function formatNumber(value) { return Number(value || 0).toLocaleString('fr-FR'); }
+      function setBrowse(available) {
+        $('browse').disabled = demo || busy || !available || !token;
+        $('browse-hint').textContent = demo ? 'Cette démonstration utilise des données fictives.' : available ?
+          'Vous pouvez aussi copier le chemin depuis l’explorateur. Choisissez un dossier stocké localement.' :
+          'Le sélecteur de dossier est indisponible ici : collez le chemin d’un dossier local depuis l’explorateur.';
+      }
+      async function fetchReport(summary) {
+        const response = await request('/api/report');
+        const text = await response.text();
+        if (reportUrl) URL.revokeObjectURL(reportUrl);
+        reportUrl = URL.createObjectURL(new Blob([text], {type: 'text/html;charset=utf-8'}));
+        $('report-frame').src = reportUrl;
+        $('stat-files').textContent = formatNumber(summary.files_scanned);
+        $('stat-files-help').textContent = formatNumber(summary.skipped_items) + ' éléments ou portions ignorés';
+        $('stat-secrets').textContent = formatNumber(summary.possible_secrets);
+        $('stat-secrets-help').textContent = formatNumber(summary.third_party_secrets) + ' dans du code tiers';
+        $('stat-info').textContent = formatNumber(summary.public_information);
+        $('stat-osv').textContent = formatNumber(summary.advisories);
+        const checked = Number(summary.osv_queries || 0);
+        const statuses = {not_requested:'non consulté', complete:formatNumber(checked)+' version'+(checked === 1 ? '' : 's')+' consultée'+(checked === 1 ? '' : 's'), partial:'recherche ou inventaire incomplet', no_supported_dependencies:'aucune version compatible', demo:'données fictives, aucune requête'};
+        $('stat-osv-help').textContent = statuses[summary.osv_status] || 'statut inconnu';
+        const partial = summary.file_scan_incomplete || summary.dependency_inventory_incomplete || summary.osv_status === 'partial';
+        $('result-status').classList.toggle('partial', partial);
+        $('result-status').textContent = summary.file_scan_incomplete ? 'Analyse des fichiers incomplète' :
+          summary.osv_status === 'partial' ? 'Recherche OSV ou inventaire incomplet' :
+          summary.dependency_inventory_incomplete ? 'Inventaire des dépendances incomplet' : 'Terminée dans le périmètre choisi';
+        $('result-note').textContent = partial ? 'Une limite, une erreur ou un inventaire incomplet réduit la couverture. Consultez les notes du rapport.' : 'Le rapport indique les éléments ignorés, les limites et les résultats tiers. Aucun résultat ne prouve qu’un projet est sûr.';
+        $('results').hidden = false;
+        $('results').scrollIntoView({behavior:'smooth', block:'start'});
+      }
+      async function poll() {
+        try {
+          const data = await (await request('/api/status')).json();
+          setBrowse(data.can_pick);
+          if (data.state === 'running') {
+            setBusy(true);
+            $('progress-title').textContent = 'Analyse en cours…';
+            $('progress-message').textContent = formatNumber(data.progress.entries) + ' entrées examinées · ' + formatNumber(data.progress.files) + ' fichiers texte analysés. Si OSV est choisi, sa consultation suit l’analyse.';
+            timer = setTimeout(poll, 1200);
+          } else if (data.state === 'complete') {
+            setBusy(false); setBrowse(data.can_pick);
+            await fetchReport(data.summary);
+          } else if (data.state === 'error') {
+            setBusy(false); setBrowse(data.can_pick); showError(data.error);
+          } else { setBusy(false); setBrowse(data.can_pick); }
+        } catch (error) { setBusy(false); showError(error.message); }
+      }
+      $('scan').addEventListener('click', async () => {
+        if (busy) return;
+        showError('');
+        const directory = $('directory').value;
+        if (!demo && !directory.trim()) { showError('Choisissez un dossier ou indiquez son chemin.'); $('directory').focus(); return; }
+        const osv = !demo && document.querySelector('input[name="osv"]:checked').value === 'yes';
+        $('results').hidden = true;
+        setBusy(true);
+        $('progress-message').textContent = 'Les grands projets peuvent prendre plusieurs minutes.';
+        try {
+          await request('/api/scan', 'POST', {directory, deep:$('deep').checked, osv});
+          if (timer) clearTimeout(timer);
+          await poll();
+        } catch (error) { setBusy(false); showError(error.message); await initialStatus(); }
+      });
+      $('browse').addEventListener('click', async () => {
+        $('browse').disabled = true; $('scan').disabled = true; showError('');
+        $('browse-hint').textContent = 'Choisissez le dossier dans la fenêtre de votre ordinateur…';
+        try {
+          const data = await (await request('/api/folder', 'POST', {})).json();
+          if (data.directory) $('directory').value = data.directory;
+        } catch (error) { showError(error.message); }
+        finally { await initialStatus(); }
+      });
+      $('download').addEventListener('click', () => {
+        if (!reportUrl) return;
+        const link = document.createElement('a'); link.href = reportUrl; link.download = 'rapport-repoguard.html';
+        document.body.appendChild(link); link.click(); link.remove();
+      });
+      $('new-scan').addEventListener('click', () => { $('form-title').scrollIntoView({behavior:'smooth',block:'start'}); if (!demo) $('directory').focus(); });
+      $('quit').addEventListener('click', async () => {
+        if (!confirm(busy ? 'Une analyse est en cours. Arrêter RepoGuard maintenant ?' : 'Arrêter RepoGuard sur cet ordinateur ?')) return;
+        try { await request('/api/shutdown', 'POST', {}); } catch (_) {}
+        if (timer) clearTimeout(timer);
+        clearInterval(heartbeat);
+        setBusy(false); fields.forEach(id => { $(id).disabled = true; });
+        $('quit').disabled = true; showError('RepoGuard est arrêté. Vous pouvez fermer cet onglet.');
+      });
+      async function initialStatus() {
+        if (!token) { fields.forEach(id => { $(id).disabled = true; }); showError('Session locale absente. Relancez RepoGuard depuis votre ordinateur.'); return; }
+        try {
+          const data = await (await request('/api/status')).json();
+          setBrowse(data.can_pick); $('scan').disabled = busy;
+          if (data.state === 'running' && !busy) { setBusy(true); await poll(); }
+          else if (data.state === 'complete' && !reportUrl) await fetchReport(data.summary);
+          else if (data.state === 'error') showError(data.error);
+        } catch (error) { fields.forEach(id => { $(id).disabled = true; }); showError(error.message); }
+      }
+      // Keep the local session alive while the page is open. A suspended or closed
+      // tab eventually stops sending heartbeats, allowing the server to shut down.
+      const heartbeat = setInterval(() => {
+        if (!demo && token && !busy) request('/api/status').catch(() => {});
+      }, 45000);
+      document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible' && token && !busy && !$('quit').disabled) initialStatus();
+      });
+      initialStatus();
+    })();
+  </script>
+</body>
+</html>

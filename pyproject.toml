@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "mindcompta-repoguard"
-version = "0.2.0"
+version = "0.3.0"
 description = "Local-first repository checks for exposed credentials and vulnerable dependencies"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -16,6 +16,7 @@ classifiers = [
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
   "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
   "License :: OSI Approved :: MIT License",
   "Operating System :: OS Independent",
 ]
@@ -29,3 +30,6 @@ repoguard = "repoguard.cli:main"
 
 [tool.setuptools.packages.find]
 include = ["repoguard*"]
+
+[tool.setuptools.package-data]
+repoguard = ["web_assets/*.html"]

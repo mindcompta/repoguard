@@ -1,0 +1,30 @@
+REPOGUARD 0.3.0 — DÉMARRER SUR WINDOWS
+=======================================
+
+Version portable : Windows 10/11 64 bits (x86-64). Elle contient Python : il n’y a rien d’autre à installer ni de commande à taper. Windows peut afficher un avertissement pour ce logiciel non signé ; vérifiez sa provenance avant de l’ouvrir.
+
+1. Extrayez TOUS les fichiers de l’archive ZIP dans un dossier à part, hors de vos projets. Dans l’explorateur Windows, clic droit sur le ZIP puis « Extraire tout ». Ne lancez pas le programme directement depuis le ZIP.
+
+2. Dans le dossier extrait, double-cliquez sur « Ouvrir-RepoGuard.bat ». Windows peut masquer l’extension « .bat » : le nom affiché sera alors « Ouvrir-RepoGuard ». Votre navigateur devrait s’ouvrir sur une adresse locale privée.
+
+3. Cliquez sur « Choisir un dossier » ou collez le chemin du projet dans le champ. Si le bouton de choix est indisponible, copiez le chemin depuis l’explorateur de fichiers : les chemins entre guillemets sont acceptés. Choisissez un dossier présent sur cet ordinateur, plutôt qu’un lecteur partagé ou synchronisé.
+
+4. Choisissez le périmètre : laissez « Analyse approfondie » coché pour inclure les dossiers de dépendances et de code tiers, ou décochez pour une analyse standard plus légère. Choisissez ensuite « Non, rester local » ou « Oui, consulter OSV », puis cliquez sur « Lancer l’analyse ».
+
+5. Le résultat apparaît dans la page. Pour le conserver après l’arrêt, cliquez sur « Télécharger le rapport HTML ». Ce fichier peut contenir des chemins et des noms de paquets sensibles : protégez-le et vérifiez-le avant de le partager.
+
+6. Quand vous avez terminé, cliquez sur « Quitter ». Fermer seulement l’onglet ne l’arrête pas immédiatement ; une session inactive s’arrête automatiquement après 30 minutes sans communication avec la page, sauf si une analyse est en cours. Les résultats non téléchargés sont alors perdus.
+
+CONFIDENTIALITÉ ET LIMITES
+- Le programme ne publie pas votre projet ni votre rapport et ne lance pas le code du projet. Il ne fait pas de demande OSV si vous choisissez « Non ».
+- Si vous choisissez « Oui », les noms de paquets, leurs écosystèmes et leurs versions exactes inventoriées sont transmis à api.osv.dev. L’adresse IP et les métadonnées de connexion peuvent également être visibles. Le code source et les valeurs trouvées ne sont pas transmis en tant que tels. Les noms de paquets peuvent eux-mêmes être sensibles.
+- Les dossiers réseau ou synchronisés peuvent être transmis par Windows, un fournisseur de stockage ou un autre logiciel, indépendamment de RepoGuard. Les chemins réseau Windows courants sont refusés, mais tous les montages et synchronisations ne peuvent pas être détectés.
+- Les alertes sont des pistes, pas des failles confirmées. L’historique Git, les binaires et les archives ne sont pas examinés. Un rapport vide ne prouve pas la sécurité du projet. Regardez les avertissements et éléments ignorés.
+
+SI CELA NE S’OUVRE PAS
+- Vérifiez que l’archive a été entièrement extraite et que vous avez bien ouvert « Ouvrir-RepoGuard », pas un fichier à l’intérieur de « runtime ».
+- Double-cliquez sur « Diagnostic-RepoGuard.bat » pour afficher une fenêtre de diagnostic. Si le navigateur ne s’ouvre pas automatiquement, copiez l’adresse affichée dans cette fenêtre et collez-la dans la barre d’adresse. Ne partagez pas cette adresse privée.
+- Le sélecteur de dossier dépend des composants Windows ; s’il échoue, collez simplement le chemin.
+- L’archive source, contrairement à la version portable, ne contient pas Python. Elle exige Python 3.10 ou plus récent, disponible sur https://www.python.org/downloads/windows/.
+
+RepoGuard est sous licence MIT. La version portable inclut la distribution Python officielle : consultez runtime\LICENSE.txt et mettez à jour RepoGuard lorsqu’une nouvelle version de sécurité est publiée.

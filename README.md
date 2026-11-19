@@ -16,7 +16,30 @@
 - Produces standalone HTML, text, JSON and SARIF 2.1.0 reports, including file inventories, omissions, reason counts, limits and coverage warnings. Human-readable HTML and text support English and French.
 - Defaults to local analysis: source files and reports are not transmitted. `--osv` is an explicit network opt-in. Python 3.10+ and no third-party **runtime** dependencies are required.
 
-## Quick start
+## Start the browser interface from a terminal
+
+With Python 3.10+ installed, extract the source archive and open a terminal in its folder. As with a local development server, start RepoGuard and then use the interface in your browser:
+
+```bash
+python3 -m repoguard web --no-browser
+```
+
+On Windows use `py -3` or `python` instead of `python3`; on Termux, `python` also works. No npm installation or third-party runtime library is needed when running directly from the source directory. The terminal prints a private local URL beginning with `http://127.0.0.1:`. Open the **entire** URL, including its `#` fragment, on the same device; the address and token change on every start. Keep the terminal open and the link private. Omit `--no-browser` to try opening it automatically.
+
+Choose or paste a local project path in the interface, select standard or deep scope, decide whether to query OSV, and read or download the report. The **Quitter** button stops the server. Some platforms, notably Termux, may not have a folder picker; paste an accessible path instead and ensure the operating system grants access. As an optional installation step, `python3 -m pip install .` installs the package and may download build tools; the web command can then run outside the source folder.
+
+## Alternative: portable Windows browser interface without typing commands
+
+1. Download **`RepoGuard-Windows-v0.3.0.zip`** accompanying this version, or check the [published releases](https://github.com/mindcompta/repoguard/releases). The portable build is for **Windows 10/11 x86-64** and bundles Python 3.14.10; no separate Python installation is required. Windows may warn that this software is unsigned: check its source.
+2. Right-click the ZIP and **Extract All** into a folder separate from your projects. Do not run the launcher from inside the ZIP.
+3. Double-click **`Ouvrir-RepoGuard.bat`**. The local browser interface opens. Choose a local folder or paste its path, choose standard or deep scope, and explicitly choose whether to query OSV. Quoted paths copied from Windows Explorer are accepted. If the folder picker is unavailable, paste the path instead.
+4. Read the report directly in the page, download the HTML if you want to keep it, and click **Quitter** to stop the app. The interface and this portable launcher are in French.
+
+The report is held in memory until the app stops unless you download it. Closing a tab does not stop the app immediately: it exits after 30 minutes with no communication from the page, but not while a scan or folder picker is active. Browser-suspended tabs can be treated as inactive. Keep the opening address private; it contains a per-session token. The server binds only to `127.0.0.1` and checks the token, Host and Origin, but is not a security boundary against malicious local software or other processes under your account. Windows network shares and mapped network drives are rejected where detected, but local-looking mounts and synchronization services cannot all be identified: they may transfer files independently of RepoGuard. Downloaded reports can contain sensitive paths and package names.
+
+If your browser does not open, double-click `Diagnostic-RepoGuard.bat` and paste its private address into the browser. The source archive, unlike the portable Windows ZIP, requires Python 3.10+. On Linux, macOS and Termux, `python3 -m repoguard web` opens the same interface when Python is available; the bundled double-click launcher targets Windows.
+
+## Command-line quick start
 
 ```bash
 git clone https://github.com/mindcompta/repoguard.git
@@ -63,7 +86,10 @@ repoguard scan [directory] [--deep] [--lang en|fr] [--progress]
                [--exclude GLOB] [--respect-inline-ignores]
                [--fail-on none|low|medium|high] [--force]
 repoguard demo [--lang en|fr] [--format text|json|html|sarif] [-o FILE] [--force]
+repoguard web [--port PORT] [--no-browser]
 ```
+
+`repoguard web` starts the real interface on the IPv4 loopback interface only; `--port 0` chooses a free port. Its synthetic-only `--demo` mode can also bind to `0.0.0.0` for a public preview; demo mode cannot inspect the filesystem, select a folder, query OSV or shut down through the API. Never expose the real local interface through a reverse proxy.
 
 - Without `-o`, the report goes to standard output; notices and progress go to standard error. Output is created with restrictive permissions where supported. Existing output is not overwritten without `--force`. The final component cannot be a symlink; `--force` is unavailable on systems without the necessary no-follow protection, commonly including Windows. Directory components may still be symlinks.
 - If the output is inside the scan directory, it is excluded from that scan. Filenames, project names and package metadata can themselves be sensitive; a secret could even be part of a filename. **Review and protect reports before sharing or uploading them.**

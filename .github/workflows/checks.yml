@@ -21,8 +21,12 @@ jobs:
             python: '3.12'
           - os: ubuntu-latest
             python: '3.13'
+          - os: ubuntu-latest
+            python: '3.14'
           - os: windows-latest
             python: '3.12'
+          - os: windows-latest
+            python: '3.14'
     steps:
       - name: Check out source
         uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
@@ -40,6 +44,20 @@ jobs:
         run: |
           python -m pip install .
           repoguard --version
+      - name: Verify installed browser assets outside the checkout
+        working-directory: ${{ runner.temp }}
+        run: |
+          python -c "from importlib import resources; from repoguard.web import WebApp; assert resources.files('repoguard').joinpath('web_assets').joinpath('index.html').is_file(); assert 'Nouvelle analyse' in WebApp().template"
+      - name: Build and smoke-test the Windows portable archive
+        if: runner.os == 'Windows' && matrix.python == '3.14'
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $bundle = Join-Path $env:RUNNER_TEMP 'RepoGuard-Windows-v0.3.0.zip'
+          python scripts/build-windows-portable.py --output $bundle
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python tests/windows_portable_smoke.py $bundle
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - name: Verify PowerShell helper on Windows
         if: runner.os == 'Windows'
         shell: pwsh
