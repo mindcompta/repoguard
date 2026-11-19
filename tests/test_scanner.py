@@ -1,9 +1,10 @@
 from pathlib import Path
+import os
 import tempfile
 import unittest
 from unittest.mock import patch
 
-from repoguard.models import Dependency
+from repoguard.models import Dependency, Finding, ScanReport
 from repoguard.osv import OsvResult
 from repoguard.reports import html_report, json_report, sarif_report, text_report
 from repoguard.scanner import scan_directory
@@ -52,12 +53,15 @@ class ScannerTests(unittest.TestCase):
 
     def test_finding_path_is_escaped_in_html_and_control_chars_are_sanitized(self):
         name = '<img onerror=x>.txt'
-        self.write(name, 'gh' + 'p_' + VALUE[:36])
-        report = scan_directory(self.root)
+        if os.name == 'nt':  # Angle brackets are not valid Windows filenames.
+            report = ScanReport(project='fixture', findings=[Finding('RG-SEC-001', 'secret', 'high', 'Example', name, 1, 'Example', 'Review')])
+        else:
+            self.write(name, 'gh' + 'p_' + VALUE[:36])
+            report = scan_directory(self.root)
         html = html_report(report)
         self.assertIn('&lt;img onerror=x&gt;', html)
         self.assertNotIn('<img onerror=x>', html)
-        if __import__('os').name != 'nt':
+        if os.name != 'nt':
             self.write('evil\x1b[31m.txt', 'gh' + 'p_' + VALUE[:36])
             self.assertNotIn('\x1b', text_report(scan_directory(self.root)))
 

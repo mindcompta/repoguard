@@ -5,7 +5,7 @@ from pathlib import Path
 import sys
 
 from . import __version__
-from .models import Dependency, Finding, ScanReport
+from .models import Dependency, Finding, ScanReport, ScannedFile, SkippedItem
 from .reports import html_report, json_report, sarif_report, text_report
 from .scanner import scan_directory
 
@@ -16,7 +16,18 @@ _RANK = {'low': 1, 'medium': 2, 'high': 3, 'critical': 4, 'unknown': 3}
 
 def _demo_report() -> ScanReport:
     """Synthetic demo only: no repository is read and no network request is made."""
-    report = ScanReport(project='demo-service (synthetic)', files_scanned=148, skipped_items=3, demo=True, osv_status='demo', osv_queries=0)
+    report = ScanReport(project='demo-service (synthetic)', scope='deep', files_scanned=148,
+                        file_entries_seen=150, skipped_items=3, binary_or_encoding_skipped=1,
+                        demo=True, osv_status='demo', osv_queries=0,
+                        limits={'file_bytes': 16777216, 'file_entries': 100000, 'total_bytes': 2147483648},
+                        encoding_counts={'UTF-8': 148},
+                        skipped_by_reason={'vcs_metadata': 1, 'binary_or_non_text': 1, 'archive_or_document_not_opened': 1},
+                        scanned_files=[ScannedFile('dist/ads.txt', 58, 58, 'UTF-8', 'generated'),
+                                       ScannedFile('config/settings.py', 512, 512, 'UTF-8', 'project')],
+                        scanned_file_details_omitted=146,
+                        skipped_details=[SkippedItem('.git', 'vcs_metadata', 'directory'),
+                                         SkippedItem('assets/image.png', 'binary_or_non_text', 'file'),
+                                         SkippedItem('backup.zip', 'archive_or_document_not_opened', 'file')])
     report.dependencies = [
         Dependency('npm', 'example-package', '1.2.3', 'package-lock.json'),
         Dependency('npm', 'sample-library', '2.4.0', 'package-lock.json'),
@@ -34,6 +45,11 @@ def _demo_report() -> ScanReport:
                 'A synthetic example of an access key ID; an ID is not the corresponding secret.',
                 'Review the associated credentials if exposure is confirmed.'),
     ]
+    report.observations = [
+        Finding('RG-INFO-001', 'information', 'info', 'Google advertising publisher identifier', 'dist/ads.txt', 1,
+                'A synthetic example of an advertising publisher identifier. Its presence is not a vulnerability.',
+                'Check the original file and advertising account configuration.', origin='generated'),
+    ]
     return report
 
 
@@ -47,18 +63,31 @@ def _parser() -> argparse.ArgumentParser:
     scan.add_argument('-o', '--output', help='Write report to a new file instead of standard output.')
     scan.add_argument('--force', action='store_true', help='Overwrite an existing output file (refuses a symlink as the final path component).')
     scan.add_argument('--osv', action='store_true', help='Opt in to OSV.dev: send dependency names, ecosystems and exact versions.')
+    scan.add_argument('--deep', action='store_true', help='Also scan vendored and dependency directories, with higher bounded limits.')
+    scan.add_argument('--lang', choices=['en', 'fr'], default='en', help='Language for text and HTML reports (default: en).')
+    scan.add_argument('--max-file-mib', type=int, metavar='N', help='Limit analyzed bytes per file to 1–128 MiB (larger files are partly analyzed).')
+    scan.add_argument('--max-total-mib', type=int, metavar='N', help='Limit total bytes examined to 1–16384 MiB.')
+    scan.add_argument('--max-files', type=int, metavar='N', help='Maximum file entries to inspect, from 1 to 500000.')
+    scan.add_argument('--progress', action='store_true', help='Show progress on stderr; no filenames or values are printed.')
     scan.add_argument('--exclude', action='append', default=[], metavar='GLOB', help='Exclude a relative path or file/directory name. Repeatable.')
     scan.add_argument('--respect-inline-ignores', action='store_true', help='Opt in to repoguard:ignore markers; ignored lines may hide real secrets.')
     scan.add_argument('--fail-on', choices=['none', 'low', 'medium', 'high'], default='none', help='Exit 1 on findings at or above this level. Unknown severity counts as high.')
     demo = sub.add_parser('demo', help='Generate a clearly labelled report with synthetic data.')
     demo.add_argument('--format', choices=_FORMATTERS, default='html')
+    demo.add_argument('--lang', choices=['en', 'fr'], default='en', help='Language for text and HTML reports.')
     demo.add_argument('-o', '--output', help='Write report to a new file instead of standard output.')
     demo.add_argument('--force', action='store_true', help='Overwrite an existing output file.')
     return parser
 
 
-def _write(content: str, output: str | None, force: bool) -> None:
+def _write(content: str, output: str | None, force: bool, report_format: str = 'text') -> None:
     if not output:
+        # Windows pipes may use a legacy encoding. JSON/SARIF are ASCII-escaped;
+        # preserve unrepresentable HTML characters as entities and text as escapes.
+        encoding = getattr(sys.stdout, 'encoding', None)
+        if encoding:
+            errors = 'xmlcharrefreplace' if report_format == 'html' else 'backslashreplace'
+            content = content.encode(encoding, errors=errors).decode(encoding)
         sys.stdout.write(content)
         return
     path = Path(output).expanduser()
@@ -77,6 +106,13 @@ def _write(content: str, output: str | None, force: bool) -> None:
         handle.write(content)
 
 
+def _stderr(message: str) -> None:
+    encoding = getattr(sys.stderr, 'encoding', None)
+    if encoding:
+        message = message.encode(encoding, errors='backslashreplace').decode(encoding)
+    print(message, file=sys.stderr, flush=True)
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = _parser()
     args = parser.parse_args(argv)
@@ -85,14 +121,28 @@ def main(argv: list[str] | None = None) -> int:
             report = _demo_report()
         else:
             if args.osv:
-                print('RepoGuard: OSV lookup enabled; dependency names, ecosystems and versions will be sent to api.osv.dev.', file=sys.stderr)
+                notice = ('OSV activé : noms, écosystèmes et versions des dépendances seront envoyés à api.osv.dev.'
+                          if args.lang == 'fr' else
+                          'OSV lookup enabled; dependency names, ecosystems and versions will be sent to api.osv.dev.')
+                _stderr('RepoGuard: ' + notice)
+            def show_progress(seen: int, scanned: int) -> None:
+                message = (f'Fichiers examinés : {seen} ; fichiers texte analysés : {scanned}' if args.lang == 'fr'
+                           else f'File entries examined: {seen}; text files scanned: {scanned}')
+                _stderr(f'RepoGuard: {message}')
             report = scan_directory(args.directory, use_osv=args.osv, excludes=tuple(args.exclude),
-                                    respect_inline_ignores=args.respect_inline_ignores, output_path=args.output)
-        _write(_FORMATTERS[args.format](report), args.output, args.force)
+                                    respect_inline_ignores=args.respect_inline_ignores, output_path=args.output,
+                                    deep=args.deep,
+                                    max_file_bytes=args.max_file_mib * 1024 * 1024 if args.max_file_mib is not None else None,
+                                    max_files=args.max_files,
+                                    max_total_bytes=args.max_total_mib * 1024 * 1024 if args.max_total_mib is not None else None,
+                                    progress=show_progress if args.progress else None)
+        rendered = (_FORMATTERS[args.format](report, language=args.lang)
+                    if args.format in {'text', 'html'} else _FORMATTERS[args.format](report))
+        _write(rendered, args.output, args.force, report_format=args.format)
     except (OSError, ValueError) as error:
         # Avoid control characters in paths supplied by the caller.
         message = ''.join(ch if ch.isprintable() else '�' for ch in str(error))
-        print(f'RepoGuard: {message}', file=sys.stderr)
+        _stderr(f'RepoGuard: {message}')
         return 2
     if args.command == 'scan':
         if report.scan_incomplete or report.osv_status == 'partial':

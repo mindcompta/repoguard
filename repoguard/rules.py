@@ -55,6 +55,18 @@ _RULES = (
     Rule('RG-SEC-010', 'Possible npm token', 'high',
          re.compile(r'(?<![A-Za-z0-9_])npm_[A-Za-z0-9]{36}(?![A-Za-z0-9_])'),
          'A string resembles an npm access token.', _ROTATE),
+    Rule('RG-SEC-011', 'Possible Google OAuth client secret', 'high',
+         re.compile(r'(?<![A-Za-z0-9_-])GOCSPX-[A-Za-z0-9_-]{20,255}(?![A-Za-z0-9_-])'),
+         'A string resembles a Google OAuth client secret. This is different from a browser API key.', _ROTATE),
+    Rule('RG-SEC-012', 'Possible Google OAuth access token', 'high',
+         re.compile(r'(?<![A-Za-z0-9_-])ya29\.[A-Za-z0-9_-]{30,255}(?![A-Za-z0-9_-])'),
+         'A string resembles a Google OAuth access token.', _ROTATE),
+    Rule('RG-SEC-013', 'Possible SendGrid API key', 'high',
+         re.compile(r'(?<![A-Za-z0-9_-])SG\.[A-Za-z0-9_-]{22}\.[A-Za-z0-9_-]{43}(?![A-Za-z0-9_-])'),
+         'A string resembles a SendGrid API key.', _ROTATE),
+    Rule('RG-SEC-014', 'Possible API secret key', 'high',
+         re.compile(r'(?<![A-Za-z0-9_-])sk-(?:(?:proj|svcacct)-|ant-api[0-9]+-)?[A-Za-z0-9_-]{32,255}(?![A-Za-z0-9_-])'),
+         'A string resembles a secret API key. Examples and unrelated strings may also match.', _ROTATE),
 )
 
 
@@ -67,14 +79,18 @@ def _entropy(value: str) -> float:
 def _looks_like_placeholder(value: str) -> bool:
     lowered = value.lower().strip()
     prefixes = ('example', 'sample', 'dummy', 'placeholder', 'changeme', 'change-me', 'replace-me', 'your_', 'your-', '<', '${')
-    return lowered.startswith(prefixes) or len(set(value)) < 5 or _entropy(value) < 3.0
+    # Common authentication error-code literals in compiled libraries are not
+    # credentials. This narrow allowlist is still a heuristic, not a guarantee.
+    error_codes = {'wrong-password', 'invalid-password', 'missing-password', 'invalid-credential', 'invalid-pending-token',
+                   'invalid-id-token', 'invalid-user-token', 'missing-recaptcha-token', 'invalid-recaptcha-token'}
+    return lowered in error_codes or lowered.startswith(prefixes) or len(set(value)) < 5 or _entropy(value) < 3.0
 
 
 MAX_FINDINGS_PER_FILE = 1000
 _IGNORE = re.compile(r'\brepoguard\s*:\s*ignore\b', re.IGNORECASE)
 
 
-def scan_text(path: str, text: str, respect_inline_ignores: bool = False) -> list[Finding]:
+def scan_text(path: str, text: str, respect_inline_ignores: bool = False, origin: str = 'project') -> list[Finding]:
     """Report at most one finding per rule per line, with no matched text."""
     findings: list[Finding] = []
     for number, line in enumerate(text.splitlines(), start=1):
@@ -87,6 +103,10 @@ def scan_text(path: str, text: str, respect_inline_ignores: bool = False) -> lis
                     value = match.group('quoted') or match.group('bare')
                     if _looks_like_placeholder(value):
                         continue
+                    # Browser API keys can be intentionally public (e.g. Firebase).
+                    # Report their recognizable format separately as information.
+                    if re.fullmatch(r'AIza[A-Za-z0-9_-]{35}', value):
+                        continue
                     # Avoid counting the same credential twice when a more specific
                     # provider rule already covers the value of this assignment.
                     if any(specific.pattern.search(value) for specific in _RULES if not specific.generic):
@@ -94,7 +114,7 @@ def scan_text(path: str, text: str, respect_inline_ignores: bool = False) -> lis
                 findings.append(Finding(
                     rule_id=rule.rule_id, category='secret', severity=rule.severity,
                     title=rule.title, path=path, line=number, detail=rule.detail,
-                    remediation=rule.remediation,
+                    remediation=rule.remediation, column=match.start() + 1, origin=origin,
                 ))
                 if len(findings) >= MAX_FINDINGS_PER_FILE:
                     return findings

@@ -12,10 +12,24 @@ _VERSION = re.compile(r'^[0-9][A-Za-z0-9.!+_-]{0,127}$')
 _REQUIREMENT = re.compile(r'^\s*([A-Za-z0-9][A-Za-z0-9._-]{0,127})(?:\[[A-Za-z0-9_,.-]+\])?\s*==\s*([0-9][A-Za-z0-9.!+_-]{0,127})\s*(?:;[^#]*)?(?:\s*#.*)?$')
 
 
+def is_installed_npm_manifest(path: str) -> bool:
+    """Recognize an installed package root, not arbitrary fixture package.json files."""
+    parts = PurePosixPath(path).parts
+    lower = [part.lower() for part in parts]
+    if not parts or lower[-1] != 'package.json' or 'node_modules' not in lower:
+        return False
+    index = len(lower) - 1 - lower[::-1].index('node_modules')
+    name_parts = parts[index + 1:-1]
+    return len(name_parts) == 1 or (len(name_parts) == 2 and name_parts[0].startswith('@'))
+
+
 def is_dependency_file(path: str) -> bool:
     parts = PurePosixPath(path).parts
     name = parts[-1].lower() if parts else ''
-    return name == 'package-lock.json' or (name.endswith('.txt') and (name.startswith('requirements') or any(part.lower() == 'requirements' for part in parts[:-1])))
+    hidden_lock = name == '.package-lock.json' and len(parts) > 1 and parts[-2].lower() == 'node_modules'
+    return (name in {'package-lock.json', 'npm-shrinkwrap.json'} or hidden_lock
+            or is_installed_npm_manifest(path)
+            or (name.endswith('.txt') and (name.startswith('requirements') or any(part.lower() == 'requirements' for part in parts[:-1]))))
 
 
 def _dependency(ecosystem: str, name: object, version: object, path: str, line: int) -> Dependency | None:
@@ -130,9 +144,24 @@ def _npm_lock(path: str, text: str) -> tuple[list[Dependency], list[str]]:
     return dependencies, warnings
 
 
+def _installed_npm_manifest(path: str, text: str) -> tuple[list[Dependency], list[str]]:
+    try:
+        manifest = json.loads(text)
+    except (ValueError, RecursionError):
+        return [], [f'{path}: installed npm package manifest could not be parsed.']
+    dep = (_dependency('npm', manifest.get('name'), manifest.get('version'), path, 1)
+           if isinstance(manifest, dict) else None)
+    if dep is None:
+        return [], [f'{path}: installed npm package has no supported exact name and version.']
+    return [dep], []
+
+
 def extract_dependencies(path: str, text: str) -> tuple[list[Dependency], list[str]]:
-    if PurePosixPath(path).name.lower() == 'package-lock.json':
+    name = PurePosixPath(path).name.lower()
+    if name in {'package-lock.json', 'npm-shrinkwrap.json', '.package-lock.json'} and is_dependency_file(path):
         return _npm_lock(path, text)
+    if is_installed_npm_manifest(path):
+        return _installed_npm_manifest(path, text)
     if is_dependency_file(path):
         return _requirements(path, text)
     return [], []

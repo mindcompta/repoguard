@@ -49,6 +49,24 @@ class DependencyTests(unittest.TestCase):
                 self.assertEqual(deps, [])
                 self.assertTrue(warnings)
 
+    def test_hidden_lock_and_shrinkwrap_and_installed_package_metadata(self):
+        lock = json.dumps({'lockfileVersion': 3, 'packages': {'node_modules/example': {'version': '1.2.3'}}})
+        for path in ('node_modules/.package-lock.json', 'npm-shrinkwrap.json'):
+            with self.subTest(path=path):
+                self.assertTrue(is_dependency_file(path))
+                deps, warnings = extract_dependencies(path, lock)
+                self.assertEqual([(d.name, d.version) for d in deps], [('example', '1.2.3')])
+                self.assertFalse(warnings)
+        manifest = '{"name":"@scope/example","version":"2.3.4"}'
+        path = 'node_modules/@scope/example/package.json'
+        self.assertTrue(is_dependency_file(path))
+        deps, warnings = extract_dependencies(path, manifest)
+        self.assertEqual([(d.name, d.version) for d in deps], [('@scope/example', '2.3.4')])
+        self.assertFalse(warnings)
+        self.assertFalse(is_dependency_file('package.json'))
+        self.assertFalse(is_dependency_file('node_modules/foo/examples/package.json'))
+        self.assertFalse(is_dependency_file('.package-lock.json'))
+
     def test_requirements_pins_only_and_no_execution(self):
         deps, warnings = extract_dependencies('requirements.txt', 'git+https://example.test/repo\npackage==1.*\n-e ./local\n')
         self.assertFalse(deps)

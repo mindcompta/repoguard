@@ -6,6 +6,7 @@ from typing import Callable
 import urllib.error
 import urllib.request
 
+from . import __version__
 from .models import Dependency
 
 API_URL = 'https://api.osv.dev/v1/querybatch'
@@ -34,7 +35,7 @@ def _post_json(payload: dict) -> dict:
     request = urllib.request.Request(
         API_URL,
         data=json.dumps(payload, separators=(',', ':')).encode('utf-8'),
-        headers={'Content-Type': 'application/json', 'Accept': 'application/json', 'User-Agent': 'RepoGuard/0.1'},
+        headers={'Content-Type': 'application/json', 'Accept': 'application/json', 'User-Agent': f'RepoGuard/{__version__}'},
         method='POST',
     )
     # Do not follow redirects: a malicious redirect must not receive inventory data.

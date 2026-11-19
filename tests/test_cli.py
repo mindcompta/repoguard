@@ -9,7 +9,7 @@ import tempfile
 import unittest
 from unittest.mock import patch
 
-from repoguard.cli import main
+from repoguard.cli import _write, main
 from repoguard.models import ScanReport
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -24,7 +24,8 @@ class CliTests(unittest.TestCase):
 
     def command(self, *args):
         return subprocess.run([sys.executable, '-m', 'repoguard', *map(str, args)], cwd=ROOT,
-                              text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=30)
+                              text=True, encoding='utf-8', env={**os.environ, 'PYTHONIOENCODING': 'utf-8'},
+                              stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=30)
 
     def test_default_scan_and_json(self):
         (self.root / 'hello.txt').write_text('no credentials here', encoding='utf-8')
@@ -63,7 +64,8 @@ class CliTests(unittest.TestCase):
         output = self.root / 'result.json'
         first = self.command('demo', '--format', 'json', '-o', output)
         self.assertEqual(first.returncode, 0, first.stderr)
-        self.assertEqual(output.stat().st_mode & 0o077, 0)
+        if os.name != 'nt':  # Windows permissions are governed by ACLs, not POSIX mode bits.
+            self.assertEqual(output.stat().st_mode & 0o077, 0)
         original = output.read_text(encoding='utf-8')
         second = self.command('demo', '--format', 'json', '-o', output)
         self.assertEqual(second.returncode, 2)
@@ -84,6 +86,45 @@ class CliTests(unittest.TestCase):
         result = self.command('demo', '--format', 'json', '-o', link, '--force')
         self.assertEqual(result.returncode, 2)
         self.assertEqual(target.read_text(encoding='utf-8'), 'do not touch')
+
+    def test_french_report_and_informational_result_do_not_fail_threshold(self):
+        publisher = 'pub-' + '1234567890123456'
+        (self.root / 'ads.txt').write_text('google.com, ' + publisher + ', DIRECT', encoding='utf-8')
+        result = self.command('scan', self.root, '--deep', '--lang', 'fr', '--fail-on', 'low', '--format', 'html')
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn('Informations publiques et configurations', result.stdout)
+        self.assertIn('ne sont pas automatiquement des secrets ou des failles', result.stdout)
+        self.assertIn('Identifiant éditeur Google publicitaire', result.stdout)
+        self.assertIn('Liste des fichiers analysés', result.stdout)
+        self.assertNotIn(publisher, result.stdout)
+        data = json.loads(self.command('scan', self.root, '--format', 'json').stdout)
+        self.assertEqual(data['schema_version'], 2)
+        self.assertEqual(data['summary']['public_information'], 1)
+        self.assertEqual(data['summary']['possible_secrets'], 0)
+        sarif = json.loads(self.command('scan', self.root, '--format', 'sarif').stdout)
+        item = sarif['runs'][0]['results'][0]
+        self.assertEqual((item['level'], item['kind'], item['properties']['category']), ('note', 'informational', 'information'))
+        self.assertIn('coverage', sarif['runs'][0]['properties'])
+
+    def test_legacy_console_encodings_do_not_crash_html_or_json(self):
+        sink = io.TextIOWrapper(io.BytesIO(), encoding='cp1252')
+        with redirect_stdout(sink):
+            _write('Hello ' + chr(0x1F600), None, False, report_format='html')
+            sink.flush()
+        self.assertIn(b'&#128512;', sink.buffer.getvalue())
+        report = ScanReport(project='project-' + chr(0x1F600))
+        from repoguard.reports import json_report, sarif_report
+        for render in (json_report, sarif_report):
+            payload = render(report)
+            self.assertTrue(payload.isascii())
+            json.loads(payload)
+
+    def test_invalid_custom_limits_exit_two(self):
+        for arguments in (('--max-file-mib', '0'), ('--max-file-mib', '129'),
+                          ('--max-total-mib', '0'), ('--max-files', '0')):
+            result = self.command('scan', self.root, *arguments)
+            self.assertEqual(result.returncode, 2, result.stderr)
+            self.assertIn('limits', result.stderr.lower())
 
     def test_demo_is_clearly_synthetic_and_sarif_is_parseable(self):
         demo = json.loads(self.command('demo', '--format', 'json').stdout)

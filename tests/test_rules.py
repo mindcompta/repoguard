@@ -25,6 +25,10 @@ class RuleTests(unittest.TestCase):
             'RG-SEC-006': 'AK' + 'IA' + '1234567890ABCDEF',
             'RG-SEC-009': 'gl' + 'pat-' + VALUE[:25],
             'RG-SEC-010': 'np' + 'm_' + VALUE[:36],
+            'RG-SEC-011': 'GOC' + 'SPX-' + VALUE[:30],
+            'RG-SEC-012': 'ya' + '29.' + VALUE[:32],
+            'RG-SEC-013': 'S' + 'G.' + VALUE[:22] + '.' + (VALUE * 2)[:43],
+            'RG-SEC-014': 's' + 'k-proj-' + VALUE[:36],
         }
         for rule, example in examples.items():
             with self.subTest(rule=rule):
@@ -43,7 +47,7 @@ class RuleTests(unittest.TestCase):
                 self.assertNotIn(VALUE, repr(items))
 
     def test_placeholders_and_env_references_are_not_reported_by_generic_rule(self):
-        for value in ('example-secret-value', 'changeme123456', '${PASSWORD_FROM_ENV}', 'aaaaaaaaaaaaaaaa', 'sample-key-1234567'):
+        for value in ('example-secret-value', 'changeme123456', '${PASSWORD_FROM_ENV}', 'aaaaaaaaaaaaaaaa', 'sample-key-1234567', 'wrong-password', 'invalid-id-token'):
             with self.subTest(value=value):
                 self.assertNotIn('RG-SEC-007', [f.rule_id for f in scan_text('a', 'password="' + value + '"')])
 
