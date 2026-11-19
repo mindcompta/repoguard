@@ -136,6 +136,14 @@ class ScannerTests(unittest.TestCase):
         self.assertFalse(report.findings)
         self.assertEqual(report.skipped_items, 1)
 
+    def test_output_exclusion_resolves_parent_aliases_and_dot_dot(self):
+        report_file = self.write('report.html', 'gh' + 'p_' + VALUE[:36])
+        (self.root / 'child').mkdir()
+        via_parent = self.root / 'child' / '..' / report_file.name
+        report = scan_directory(self.root, output_path=str(via_parent))
+        self.assertFalse(report.findings)
+        self.assertEqual(report.skipped_by_reason['report_output'], 1)
+
     def test_finding_cap_marks_file_scan_incomplete(self):
         token = 'gh' + 'p_' + VALUE[:36]
         self.write('a.txt', (token + '\n') * 5)

@@ -131,8 +131,10 @@ def scan_directory(directory: str | Path, use_osv: bool = False, excludes: tuple
     output_relative = None
     if output_path:
         try:
-            output_relative = Path(output_path).expanduser().absolute().relative_to(root).as_posix()
-        except ValueError:
+            # Canonicalize parent aliases, junctions and .. consistently with root.
+            # In particular, Windows temporary directories may use 8.3 short names.
+            output_relative = Path(output_path).expanduser().resolve(strict=False).relative_to(root).as_posix()
+        except (OSError, RuntimeError, ValueError):
             pass
 
     def warn(message: str) -> None:
